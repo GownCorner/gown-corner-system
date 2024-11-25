@@ -1,0 +1,39 @@
+.date-picker-container {
+    position: relative;
+}
+
+.date-picker-button {
+    background-color: #f8e6d1;
+    color: #333;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.date-picker-popup {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    z-index: 10;
+    background: white;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.apply-button {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0.5rem 1rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.apply-button:hover {
+    background-color: #555;
+}

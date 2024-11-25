@@ -1,0 +1,113 @@
+/* Signup Page Container */
+.signup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f9f9f9; /* Light gray background */
+  padding: 20px;
+}
+
+/* Card Wrapper */
+.signup-card {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Title */
+.signup-card h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
+  color: #333;
+}
+
+/* Form Styles */
+.signup-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input Group */
+.input-group {
+  margin-bottom: 20px; /* Adjust spacing between input fields */
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #007bff; /* Blue border on focus */
+}
+
+/* Signup Button */
+.signup-button {
+  padding: 12px;
+  background-color: #007bff; /* Blue button */
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Success and Error Messages */
+.success-message,
+.error-message {
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.success-message {
+  color: #28a745; /* Green for success */
+}
+
+.error-message {
+  color: #dc3545; /* Red for error */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .signup-card {
+    padding: 20px;
+  }
+
+  .signup-card h1 {
+    font-size: 20px;
+  }
+
+  .input-group input {
+    font-size: 14px;
+  }
+
+  .signup-button {
+    font-size: 14px;
+  }
+}

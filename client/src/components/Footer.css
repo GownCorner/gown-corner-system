@@ -1,0 +1,148 @@
+/* General Footer Styling */
+.footer {
+    background-color: #213e30; /* Dark green background */
+    padding: 3rem 2rem;
+    font-family: 'Playfair Display', serif; /* Elegant serif font for headings */
+    color: #ffffff; /* White text for better contrast */
+    text-align: center;
+}
+
+/* Top Section */
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #d4af37; /* Gold border for elegance */
+}
+
+.footer-section {
+    width: 45%; /* Equal space for both sections */
+    text-align: left;
+}
+
+.footer-section h3 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffffff; /* White headings */
+    margin-bottom: 1rem;
+}
+
+.footer-section p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #ffffff; /* White text for readability */
+}
+
+/* Social Media Section */
+.footer-social {
+    margin-top: 2rem;
+}
+
+.footer-social h4 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-family: 'Roboto', sans-serif; /* Clean font for social media section */
+    font-weight: 600;
+    color: #ffffff; /* White headings */
+}
+
+.social-feed {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.social-feed img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #d4af37; /* Gold border for images */
+    transition: transform 0.3s ease-in-out;
+}
+
+.social-feed img:hover {
+    transform: scale(1.05); /* Subtle zoom effect on hover */
+}
+
+.social-follow-button {
+    padding: 0.8rem 2rem;
+    font-size: 1.5rem;
+    color: #213e30; /* Green text for button */
+    background-color: lightblue; /* White button */
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.social-follow-button:hover {
+    background-color: #d4af37; /* Gold hover effect */
+    color: #213e30; /* Green text on hover */
+}
+
+/* Footer Bottom Section */
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2rem;
+    font-size: 1rem;
+    color: #ffffff; /* White text */
+    border-top: 1px solid #d4af37; /* Gold border */
+    flex-wrap: wrap;
+}
+
+/* Useful Links Section */
+.footer-links {
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+.footer-links h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Roboto', sans-serif; /* Consistent font for links */
+    color: #ffffff; /* White text for headings */
+    font-weight: 600;
+}
+
+.footer-links a {
+    font-size: 1rem;
+    color: #ffffff; /* White text for links */
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #d4af37; /* Gold hover effect */
+    text-decoration: underline;
+}
+
+/* Footer Logo */
+.footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.footer-logo img {
+    width: 100px;
+    height: auto;
+    margin-top: 1rem;
+}
+
+/* Footer Bottom Text */
+.footer-bottom p {
+    font-size: 1rem;
+    color: #ffffff; /* White text */
+    text-align: center;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+}

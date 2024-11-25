@@ -1,0 +1,34 @@
+.catalog {
+    padding: 2rem;
+}
+
+.catalog h2 {
+    font-size: 2rem;
+    color: #8a7267;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.dress-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.dress-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+    transition: transform 0.3s;
+    text-align: center;
+}
+
+.dress-item:hover {
+    transform: scale(1.05);
+}
+
+.dress-item img {
+    width: 100%;
+    height: auto;
+}

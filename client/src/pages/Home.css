@@ -1,0 +1,100 @@
+/* Home container styling */
+.home {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    animation: fadeBackground 10s infinite; /* Background transition animation */
+}
+
+/* Overlay to darken the background for better readability */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for enhanced readability */
+    z-index: 1;
+}
+
+/* Main content positioning */
+.content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+    font-family: 'Playfair Display', serif; /* Elegant and modern font */
+}
+
+/* Title font styling */
+.content h1 {
+    font-size: 6rem; /* Scaled down slightly for better responsiveness */
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4rem; /* Slightly increased spacing for elegance */
+    font-family: 'Playfair Display', serif; /* High-contrast serif font */
+}
+
+/* Subtitle font styling */
+.content p {
+    font-size: 1.8rem; /* Scaled down slightly for balance */
+    margin-bottom: 2rem;
+    font-family: 'Montserrat', sans-serif; /* Clean sans-serif font for contrast */
+    letter-spacing: 0.2rem; /* Balanced spacing */
+    color: #f8f8f8; /* Light color for readability on overlay */
+}
+
+/* Button styling */
+.cta-button {
+    padding: 1.2rem 3rem; /* Larger padding for a luxurious feel */
+    background-color: transparent;
+    color: black;
+    font-size: 2rem; /* Balanced size for prominence */
+    border: 2px solid black; /* Bold black border */
+    border-radius: 50px; /* Rounded edges for smooth styling */
+    cursor: pointer;
+    transition: all 0.4s ease-in-out; /* Smoother hover transition */
+    font-family: 'Montserrat', sans-serif; /* Consistent with subtitle font */
+    font-weight: 700; /* Slightly bold for prominence */
+    letter-spacing: 0.2rem; /* Subtle spacing for elegance */
+    text-align: center;
+}
+
+/* Button hover effect */
+.cta-button:hover {
+    background-color: black; /* Black background for contrast */
+    color: white; /* White text for clear visibility */
+    transform: scale(1.05); /* Slight scaling for hover feedback */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .content h1 {
+        font-size: 4rem; /* Adjust title size for smaller screens */
+    }
+    .content p {
+        font-size: 1.5rem; /* Adjust subtitle size for smaller screens */
+    }
+    .cta-button {
+        font-size: 1.5rem; /* Adjust button text size */
+        padding: 1rem 2rem; /* Adjust padding for smaller buttons */
+    }
+}
+
+/* Background transition animation */
+@keyframes fadeBackground {
+    0% {
+        background-image: url('../assets/blackgown.jpg'); /* First background image */
+    }
+    50% {
+        background-image: url('../assets/HeroImage.jpg'); /* Second background image */
+    }
+    100% {
+        background-image: url('../assets/redgown.jpg'); /* Loop back to the first image */
+    }
+}

@@ -1,0 +1,84 @@
+.calendar-modal {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    margin: 0 auto;
+  }
+  
+  .calendar-modal h2 {
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .date-inputs {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .date-inputs input {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .calendar-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .calendar-buttons button {
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .calendar-buttons .cancel-button {
+    background-color: #f44336;
+    color: #ffffff;
+  }
+  
+  .calendar-buttons .confirm-button {
+    background-color: #4caf50;
+    color: #ffffff;
+  }
+  
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .calendar-grid div {
+    text-align: center;
+    padding: 8px;
+    font-size: 14px;
+    color: #333333;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .calendar-grid .selected-date {
+    background-color: #4caf50;
+    color: #ffffff;
+  }
+  

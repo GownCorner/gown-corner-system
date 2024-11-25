@@ -1,0 +1,58 @@
+.payment-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.payment-container h2 {
+    font-size: 2rem;
+    color: #213e30;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.order-summary,
+.shipping-details {
+    margin-bottom: 20px;
+}
+
+.order-summary h3,
+.shipping-details h3 {
+    font-size: 1.5rem;
+    color: #213e30;
+    margin-bottom: 10px;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-item p {
+    font-size: 1rem;
+    color: #333;
+}
+
+.payment-container button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #d4af37;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.payment-container button:hover {
+    background-color: #b2922c;
+}
