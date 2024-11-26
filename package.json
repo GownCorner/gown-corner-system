@@ -7,8 +7,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "postinstall": "chmod -R +x node_modules/.bin/ && chmod -R +x client/node_modules/.bin/"
+    "eject": "react-scripts eject"
+   
   },
   "keywords": [],
   "author": "",
