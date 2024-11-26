@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../services/api";
+import { getAllUsers, deleteUser } from "../services/api";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -7,8 +7,8 @@ const AdminUsers = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("/users");
-        setUsers(response.data);
+        const usersData = await getAllUsers();
+        setUsers(usersData);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -17,9 +17,9 @@ const AdminUsers = () => {
     fetchUsers();
   }, []);
 
-  const handleDeleteUser = async (userId) => {
+  const handleDelete = async (userId) => {
     try {
-      await axios.delete(`/users/${userId}`);
+      await deleteUser(userId);
       setUsers(users.filter((user) => user._id !== userId));
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -47,10 +47,9 @@ const AdminUsers = () => {
               <td className="px-4 py-2 border">{user.email}</td>
               <td className="px-4 py-2 border">{user.role}</td>
               <td className="px-4 py-2 border">
-                <button className="bg-yellow-400 px-2 py-1 rounded">Edit</button>
                 <button
-                  onClick={() => handleDeleteUser(user._id)}
-                  className="bg-red-500 px-2 py-1 rounded text-white ml-2"
+                  onClick={() => handleDelete(user._id)}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
                 >
                   Delete
                 </button>

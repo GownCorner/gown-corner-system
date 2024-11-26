@@ -19,10 +19,16 @@ import Cancel from "./pages/Cancel";
 
 const ProtectedRoute = ({ element, role }) => {
   const { user } = useContext(AuthContext);
-  console.log("User:", user); // Debugging
+  console.log("Current User:", user);
 
-  if (!user) return <Navigate to="/login" />;
-  if (role && user.role !== role) return <Navigate to="/" />;
+  if (!user) {
+    console.log("No user logged in. Redirecting to login.");
+    return <Navigate to="/login" />;
+  }
+  if (role && user.role !== role) {
+    console.log(`Unauthorized role: ${user.role}. Redirecting to home.`);
+    return <Navigate to="/" />;
+  }
   return element;
 };
 

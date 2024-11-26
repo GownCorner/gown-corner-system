@@ -1,97 +1,77 @@
 import axios from "axios";
 
-// Create an Axios instance with a base URL
 const API = axios.create({
-  baseURL: "http://localhost:5000/api", // Adjust base URL if necessary
+  baseURL: "http://localhost:5000/api", // Backend base URL
   headers: {
-    "Content-Type": "application/json", // Default content type
+    "Content-Type": "application/json",
   },
 });
 
-// Add a request interceptor to include the token automatically
+// Include authorization token in requests
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    const token = localStorage.getItem("token");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Add Authorization header
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error); // Pass through request errors
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle errors globally
+// Handle unauthorized responses
 API.interceptors.response.use(
-  (response) => response, // Return successful responses
+  (response) => response,
   (error) => {
-    // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {
       console.error("Unauthorized - Redirecting to login...");
-      localStorage.removeItem("token"); // Remove invalid token
-      window.location.href = "/login"; // Redirect to login
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
-    return Promise.reject(error); // Pass through other errors
+    return Promise.reject(error);
   }
 );
 
-// Authentication APIs
-export const registerUser = async (userData) => {
-  return await API.post("/auth/register", userData);
+// Fetch all bookings (admin view)
+export const fetchBookings = async () => {
+  try {
+    const response = await API.get("/bookings");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching bookings:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
-export const loginUser = async (userData) => {
-  return await API.post("/auth/login", userData);
-};
-
-// Gown APIs
-export const fetchGowns = async () => {
-  return await API.get("/gowns");
-};
-
-// Order APIs
-export const createOrder = async (orderData) => {
-  return await API.post("/orders", orderData);
-};
-
-// Booking APIs
-export const createBooking = async (bookingData) => {
-  return await API.post("/bookings", bookingData);
-};
-
-export const getUserBookings = async (userId) => {
-  return await API.get(`/bookings/user/${userId}`);
-};
-
-// Admin APIs
-export const getAllBookings = async () => {
-  return await API.get("/admin/bookings");
-};
-
-export const updateBookingStatus = async (bookingId, status) => {
-  return await API.put(`/admin/bookings/${bookingId}`, { status });
+// Delete a booking by ID
+export const deleteBooking = async (bookingId) => {
+  try {
+    const response = await API.delete(`/bookings/${bookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting booking:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const getAllUsers = async () => {
-  return await API.get("/admin/users");
+  try {
+    const response = await API.get("/users");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const deleteUser = async (userId) => {
-  return await API.delete(`/admin/users/${userId}`);
+  try {
+    const response = await API.delete(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
-export const getAllInventory = async () => {
-  return await API.get("/admin/inventory");
-};
-
-export const updateInventory = async (inventoryId, inventoryData) => {
-  return await API.put(`/admin/inventory/${inventoryId}`, inventoryData);
-};
-
-export const deleteInventoryItem = async (inventoryId) => {
-  return await API.delete(`/admin/inventory/${inventoryId}`);
-};
-
-// Export Axios instance
 export default API;

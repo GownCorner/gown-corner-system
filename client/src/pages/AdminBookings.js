@@ -1,20 +1,31 @@
 import React, { useEffect, useState } from "react";
-import axios from "../services/api";
+import { fetchBookings, deleteBooking } from "../services/api";
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchAllBookings = async () => {
       try {
-        const response = await axios.get("/bookings");
-        setBookings(response.data);
+        const data = await fetchBookings();
+        setBookings(data);
       } catch (error) {
-        console.error("Error fetching bookings:", error);
+        console.error("Error fetching bookings:", error.message);
       }
     };
-    fetchBookings();
+
+    fetchAllBookings();
   }, []);
+
+  const handleDelete = async (bookingId) => {
+    try {
+      await deleteBooking(bookingId);
+      setBookings(bookings.filter((booking) => booking._id !== bookingId));
+      console.log("Booking deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting booking:", error.message);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -24,7 +35,10 @@ const AdminBookings = () => {
           <tr>
             <th className="px-4 py-2 border">Booking ID</th>
             <th className="px-4 py-2 border">Client Email</th>
-            <th className="px-4 py-2 border">Status</th>
+            <th className="px-4 py-2 border">Gown Name</th>
+            <th className="px-4 py-2 border">Pickup Date</th>
+            <th className="px-4 py-2 border">Return Date</th>
+            <th className="px-4 py-2 border">Total Price</th>
             <th className="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
@@ -32,11 +46,18 @@ const AdminBookings = () => {
           {bookings.map((booking) => (
             <tr key={booking._id}>
               <td className="px-4 py-2 border">{booking._id}</td>
-              <td className="px-4 py-2 border">{booking.clientEmail}</td>
-              <td className="px-4 py-2 border">{booking.status}</td>
+              <td className="px-4 py-2 border">{booking.userId?.email}</td>
+              <td className="px-4 py-2 border">{booking.gownId?.name}</td>
+              <td className="px-4 py-2 border">{new Date(booking.pickupDate).toLocaleDateString()}</td>
+              <td className="px-4 py-2 border">{new Date(booking.returnDate).toLocaleDateString()}</td>
+              <td className="px-4 py-2 border">{booking.totalPrice}</td>
               <td className="px-4 py-2 border">
-                <button className="bg-yellow-400 px-2 py-1 rounded">Edit</button>
-                <button className="bg-red-500 px-2 py-1 rounded text-white ml-2">Delete</button>
+                <button
+                  onClick={() => handleDelete(booking._id)}
+                  className="bg-red-500 px-2 py-1 rounded text-white"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}

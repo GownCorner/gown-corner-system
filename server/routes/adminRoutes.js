@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { isAdmin } = require("../middleware/adminMiddleware");
 const {
-    getAllBookings,
-    editBooking,
-    deleteBooking,
+  getAllBookings,
+  editBooking,
+  deleteBooking,
 } = require("../controllers/adminController");
 
 // Admin routes

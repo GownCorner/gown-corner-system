@@ -35,12 +35,18 @@ const gownRoutes = require("./routes/gownRoutes");
 const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const userRoutes = require("./routes/userRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 // Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/gowns", gownRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/bookings", bookingRoutes); // Add booking routes
 
 // Default 404 handler
 app.use((req, res) => {
