@@ -8,9 +8,12 @@ const API_BASE_URL =
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: "https://gown-booking-system.onrender.com/api", // Correct backend URL
   headers: {
-    "Content-Type": "application/json", // Default content type
+    "Content-Type": "application/json",
+  },
+});
+
   },
 });
 
