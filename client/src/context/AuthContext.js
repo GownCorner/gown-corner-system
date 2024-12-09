@@ -1,7 +1,11 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
-export const AuthContext = createContext();
+export const AuthContext = createContext({
+  user: null,
+  login: async () => {},
+  logout: () => {},
+});
 
 const url = "https://gown-booking-system.onrender.com/api"; // Base backend URL
 
@@ -13,8 +17,8 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const { exp } = JSON.parse(atob(token.split(".")[1])); // Decode JWT token
-          if (Date.now() >= exp * 1000) {
+          const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT token
+          if (Date.now() >= decodedToken.exp * 1000) {
             localStorage.removeItem("token");
             setUser(null);
             return;
@@ -25,7 +29,7 @@ export const AuthProvider = ({ children }) => {
           });
           setUser(response.data);
         } catch (error) {
-          console.error("Error fetching user:", error.message);
+          console.error("Error decoding token or fetching user:", error.message);
           localStorage.removeItem("token");
           setUser(null);
         }
@@ -43,14 +47,18 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", response.data.token); // Save token
       setUser(response.data.user); // Update user state immediately
     } catch (error) {
-      console.error("Login failed:", error.message);
-      throw error;
+      if (error.response && error.response.data.message) {
+        throw new Error(error.response.data.message); // Backend-provided error message
+      } else {
+        throw new Error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("token");
+    window.location.href = "/login"; // Redirect to login page
   };
 
   return (
@@ -59,3 +67,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export { url };
