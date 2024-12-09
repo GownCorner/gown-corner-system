@@ -1,50 +1,61 @@
+import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
-// Determine the base URL based on the environment
-const API_BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://gown-booking-system.onrender.com/api" // Production backend URL
-    : "http://localhost:5000/api"; // Development backend URL
+export const AuthContext = createContext();
 
-// Create an Axios instance
-const api = axios.create({
-  baseURL: "https://gown-booking-system.onrender.com/api", // Correct backend URL
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+export const url = "https://gown-booking-system.onrender.com/api"; // Export the base backend URL
 
-  },
-});
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
 
-// Add an interceptor to include the authorization token in every request
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token"); // Retrieve token from localStorage
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Add Authorization header
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const { exp } = JSON.parse(atob(token.split(".")[1])); // Decode JWT token
+          if (Date.now() >= exp * 1000) {
+            localStorage.removeItem("token");
+            setUser(null);
+            return;
+          }
+
+          const response = await axios.get(`${url}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUser(response.data);
+        } catch (error) {
+          console.error("Error fetching user:", error.message);
+          localStorage.removeItem("token");
+          setUser(null);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post(`${url}/auth/login`, {
+        email,
+        password,
+      });
+      localStorage.setItem("token", response.data.token); // Save token
+      setUser(response.data.user); // Update user state immediately
+    } catch (error) {
+      console.error("Login failed:", error.message);
+      throw error;
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error); // Handle request errors
-  }
-);
+  };
 
-// Add an interceptor to handle responses globally
-api.interceptors.response.use(
-  (response) => {
-    return response; // Pass through successful responses
-  },
-  (error) => {
-    // Handle response errors globally (e.g., 401 Unauthorized)
-    if (error.response && error.response.status === 401) {
-      console.error("Unauthorized access - logging out...");
-      localStorage.removeItem("token"); // Clear token
-      window.location.href = "/login"; // Redirect to login
-    }
-    return Promise.reject(error); // Pass through other errors
-  }
-);
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("token");
+  };
 
-export default api;
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
