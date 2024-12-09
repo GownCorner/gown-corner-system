@@ -4,6 +4,13 @@ import axios from "axios";
 // Use REACT_APP_API_BASE_URL from the environment variables
 export const url = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api"; // Fallback to local backend if not set
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
