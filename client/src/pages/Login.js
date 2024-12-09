@@ -1,12 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null); // To display error messages
-  const { login } = useContext(AuthContext); // Use login from AuthContext
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -14,11 +12,28 @@ const Login = () => {
     setErrorMessage(null); // Reset error message
 
     try {
-      await login(email, password); // Call AuthContext login function
-      navigate("/"); // Redirect to home
+      const response = await fetch("https://gown-booking-system.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+
+      const data = await response.json();
+      console.log("Login successful:", data);
+
+      // Save token and redirect based on role
+      localStorage.setItem("token", data.token);
+      navigate(data.user.role === "admin" ? "/admin/dashboard" : "/");
     } catch (error) {
       console.error("Login error:", error.message);
-      setErrorMessage("Invalid email or password");
+      setErrorMessage(error.message); // Set error message for display
     }
   };
 
