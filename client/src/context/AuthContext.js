@@ -38,8 +38,8 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
       });
-      setUser(response.data.user);
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response.data.token); // Save token
+      setUser(response.data.user); // Update user state immediately
     } catch (error) {
       console.error("Login failed:", error.message);
       throw error;

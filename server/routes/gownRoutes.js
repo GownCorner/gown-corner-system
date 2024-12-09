@@ -1,5 +1,5 @@
 const express = require("express");
-const Gown = require("../models/Gown"); // Ensure the model is correctly imported
+const Gown = require("../models/Gown");
 const router = express.Router();
 
 // Get all gowns
@@ -8,74 +8,71 @@ router.get("/", async (req, res) => {
     const gowns = await Gown.find({});
     res.status(200).json(gowns);
   } catch (error) {
-    console.error("Error fetching gowns:", error);
-    res.status(500).json({ message: "Error fetching gowns", error });
+    console.error("Error fetching gowns:", error.message);
+    res.status(500).json({ message: "Error fetching gowns", error: error.message });
   }
 });
 
-// Check gown availability
-router.post("/availability", async (req, res) => {
-  const { gownId, startDate, endDate } = req.body;
+// Add a new gown
+router.post("/", async (req, res) => {
+  const { name, category, price } = req.body;
+
+  if (!name || !category || price === undefined) {
+    return res.status(400).json({ message: "All fields (name, category, price) are required" });
+  }
 
   try {
-    const gown = await Gown.findById(gownId);
-
-    if (!gown) {
-      return res.status(404).json({ message: "Gown not found" });
-    }
-
-    // Check if any date overlaps
-    const isAvailable = gown.availability.every(
-      (range) =>
-        new Date(endDate) < new Date(range.startDate) ||
-        new Date(startDate) > new Date(range.endDate)
-    );
-
-    if (!isAvailable) {
-      return res
-        .status(400)
-        .json({ message: "Gown not available for selected dates" });
-    }
-
-    res.status(200).json({ message: "Gown available" });
+    const newGown = new Gown({ name, category, price });
+    await newGown.save();
+    res.status(201).json({ message: "Gown added successfully", gown: newGown });
   } catch (error) {
-    console.error("Error checking availability:", error);
-    res.status(500).json({ message: "Error checking availability", error });
+    console.error("Error adding gown:", error.message);
+    res.status(500).json({ message: "Error adding gown", error: error.message });
   }
 });
 
-// Book gown (update availability)
-router.post("/book", async (req, res) => {
-  const { gownId, startDate, endDate } = req.body;
+// Update a gown
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, category, price } = req.body;
+
+  if (!name || !category || price === undefined) {
+    return res.status(400).json({ message: "All fields (name, category, price) are required" });
+  }
 
   try {
-    const gown = await Gown.findById(gownId);
+    const updatedGown = await Gown.findByIdAndUpdate(
+      id,
+      { name, category, price },
+      { new: true, runValidators: true }
+    );
 
-    if (!gown) {
+    if (!updatedGown) {
       return res.status(404).json({ message: "Gown not found" });
     }
 
-    // Check if any date overlaps
-    const isAvailable = gown.availability.every(
-      (range) =>
-        new Date(endDate) < new Date(range.startDate) ||
-        new Date(startDate) > new Date(range.endDate)
-    );
+    res.status(200).json({ message: "Gown updated successfully", gown: updatedGown });
+  } catch (error) {
+    console.error("Error updating gown:", error.message);
+    res.status(500).json({ message: "Error updating gown", error: error.message });
+  }
+});
 
-    if (!isAvailable) {
-      return res
-        .status(400)
-        .json({ message: "Gown not available for selected dates" });
+// Delete a gown
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedGown = await Gown.findByIdAndDelete(id);
+
+    if (!deletedGown) {
+      return res.status(404).json({ message: "Gown not found" });
     }
 
-    // Update the gown's availability
-    gown.availability.push({ startDate, endDate });
-    await gown.save();
-
-    res.status(200).json({ message: "Gown booked successfully" });
+    res.status(200).json({ message: "Gown deleted successfully", gown: deletedGown });
   } catch (error) {
-    console.error("Error booking gown:", error);
-    res.status(500).json({ message: "Error booking gown", error });
+    console.error("Error deleting gown:", error.message);
+    res.status(500).json({ message: "Error deleting gown", error: error.message });
   }
 });
 

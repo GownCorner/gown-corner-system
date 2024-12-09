@@ -1,10 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const { isAdmin } = require("../middleware/adminMiddleware");
-const { getAllUsers, deleteUser } = require("../controllers/userController");
+const { getAllUsers, deleteUser, updateUser } = require("../controllers/userController");
 
-// User routes
-router.get("/", isAdmin, getAllUsers); // Fetch all users
-router.delete("/:id", isAdmin, deleteUser); // Delete a user
+// Get all users
+router.get("/", isAdmin, getAllUsers);
+
+// Update a user
+router.put("/:id", isAdmin, updateUser);
+
+// Delete a user
+router.delete("/:id", isAdmin, deleteUser);
 
 module.exports = router;

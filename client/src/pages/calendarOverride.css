@@ -1,0 +1,22 @@
+/* calendarOverride.css */
+.rdrDayNumber span {
+    color: white !important; /* Ensure numbers are visible on green */
+  }
+  
+  .rdrDayNumber {
+    background-color: #34d399 !important; /* Tailwind's green-400 */
+  }
+  
+  .rdrDayToday .rdrDayNumber span {
+    font-weight: bold !important; /* Highlight today's date */
+  }
+  
+  .rdrDayDisabled {
+    background-color: #e5e7eb !important; /* Tailwind's gray-200 for disabled dates */
+    color: #9ca3af !important; /* Tailwind's gray-400 for disabled text */
+  }
+  
+  .rdrDayDisabled .rdrDayNumber span {
+    color: #9ca3af !important; /* Ensure disabled text is consistent */
+  }
+  

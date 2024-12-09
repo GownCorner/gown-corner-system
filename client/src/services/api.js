@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// Create Axios instance
 const API = axios.create({
   baseURL: "http://localhost:5000/api", // Backend base URL
   headers: {
@@ -32,27 +33,53 @@ API.interceptors.response.use(
   }
 );
 
-// Fetch all bookings (admin view)
-export const fetchBookings = async () => {
+////////////////////
+// Gowns API
+////////////////////
+
+export const fetchGowns = async () => {
   try {
-    const response = await API.get("/bookings");
+    const response = await API.get("/gowns");
     return response.data;
   } catch (error) {
-    console.error("Error fetching bookings:", error.response?.data || error.message);
+    console.error("Error fetching gowns:", error.response?.data || error.message);
     throw error;
   }
 };
 
-// Delete a booking by ID
-export const deleteBooking = async (bookingId) => {
+export const addGown = async (gownData) => {
   try {
-    const response = await API.delete(`/bookings/${bookingId}`);
+    const response = await API.post("/gowns", gownData);
     return response.data;
   } catch (error) {
-    console.error("Error deleting booking:", error.response?.data || error.message);
+    console.error("Error adding gown:", error.response?.data || error.message);
     throw error;
   }
 };
+
+export const editGown = async (gownId, updatedData) => {
+  try {
+    const response = await API.put(`/gowns/${gownId}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating gown:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteGown = async (gownId) => {
+  try {
+    const response = await API.delete(`/gowns/${gownId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting gown:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+////////////////////
+// Users API
+////////////////////
 
 export const getAllUsers = async () => {
   try {
@@ -64,12 +91,84 @@ export const getAllUsers = async () => {
   }
 };
 
+export const editUser = async (userId, updatedData) => {
+  try {
+    const response = await API.put(`/users/${userId}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const deleteUser = async (userId) => {
   try {
     const response = await API.delete(`/users/${userId}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting user:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+////////////////////
+// Bookings API
+////////////////////
+
+export const fetchBookings = async (status = "") => {
+  try {
+    const response = await API.get("/bookings", {
+      params: { status }, // Pass status as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching bookings:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const updateBookingStatus = async (bookingId, status) => {
+  try {
+    const response = await API.put(`/bookings/${bookingId}`, { status });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating booking status:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteBooking = async (bookingId) => {
+  try {
+    const response = await API.delete(`/bookings/${bookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting booking:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+////////////////////
+// Orders API
+////////////////////
+
+export const fetchOrders = async (status = "") => {
+  try {
+    const response = await API.get("/orders", {
+      params: { status }, // Pass status as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching orders:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteOrder = async (orderId) => {
+  try {
+    const response = await API.delete(`/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting order:", error.response?.data || error.message);
     throw error;
   }
 };

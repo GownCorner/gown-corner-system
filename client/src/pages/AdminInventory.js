@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../services/api";
+import { fetchGowns, addGown, editGown, deleteGown } from "../services/api"; // API functions
 
 const AdminInventory = () => {
   const [inventory, setInventory] = useState([]);
@@ -8,36 +8,59 @@ const AdminInventory = () => {
     category: "",
     price: "",
   });
+  const [editGownData, setEditGownData] = useState(null); // State for editing gown
 
+  // Fetch all gowns on component mount
   useEffect(() => {
-    const fetchInventory = async () => {
+    const loadInventory = async () => {
       try {
-        const response = await axios.get("/gowns");
-        setInventory(response.data);
+        const data = await fetchGowns();
+        setInventory(data);
       } catch (error) {
         console.error("Error fetching inventory:", error);
       }
     };
-
-    fetchInventory();
+    loadInventory();
   }, []);
 
+  // Add a new gown
   const handleAddGown = async () => {
     try {
-      const response = await axios.post("/gowns", newGown);
-      setInventory([...inventory, response.data]);
-      setNewGown({ name: "", category: "", price: "" }); // Reset form
+      const response = await addGown(newGown);
+      setInventory([...inventory, response]); // Add the new gown to the inventory
+      setNewGown({ name: "", category: "", price: "" }); // Reset the form
     } catch (error) {
       console.error("Error adding gown:", error);
     }
   };
 
+  // Delete a gown
   const handleDeleteGown = async (gownId) => {
     try {
-      await axios.delete(`/gowns/${gownId}`);
-      setInventory(inventory.filter((item) => item._id !== gownId));
+      await deleteGown(gownId);
+      setInventory(inventory.filter((item) => item._id !== gownId)); // Remove the gown from inventory
     } catch (error) {
       console.error("Error deleting gown:", error);
+    }
+  };
+
+  // Open the edit modal
+  const handleEditGown = (gown) => {
+    setEditGownData(gown); // Set the selected gown for editing
+  };
+
+  // Update a gown
+  const handleUpdateGown = async () => {
+    try {
+      const updatedGown = await editGown(editGownData._id, editGownData); // Call the API to update the gown
+      setInventory(
+        inventory.map((item) =>
+          item._id === updatedGown._id ? updatedGown : item
+        )
+      );
+      setEditGownData(null); // Close the edit modal
+    } catch (error) {
+      console.error("Error updating gown:", error);
     }
   };
 
@@ -59,7 +82,9 @@ const AdminInventory = () => {
           type="text"
           placeholder="Category"
           value={newGown.category}
-          onChange={(e) => setNewGown({ ...newGown, category: e.target.value })}
+          onChange={(e) =>
+            setNewGown({ ...newGown, category: e.target.value })
+          }
           className="border px-4 py-2 mb-2 mr-2"
         />
         <input
@@ -96,7 +121,12 @@ const AdminInventory = () => {
               <td className="px-4 py-2 border">{item.category}</td>
               <td className="px-4 py-2 border">₱{item.price}</td>
               <td className="px-4 py-2 border">
-                <button className="bg-yellow-400 px-2 py-1 rounded">Edit</button>
+                <button
+                  onClick={() => handleEditGown(item)}
+                  className="bg-yellow-400 px-2 py-1 rounded"
+                >
+                  Edit
+                </button>
                 <button
                   onClick={() => handleDeleteGown(item._id)}
                   className="bg-red-500 px-2 py-1 rounded text-white ml-2"
@@ -108,8 +138,59 @@ const AdminInventory = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Edit Gown Modal */}
+      {editGownData && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Edit Gown</h2>
+            <input
+              type="text"
+              placeholder="Name"
+              value={editGownData.name}
+              onChange={(e) =>
+                setEditGownData({ ...editGownData, name: e.target.value })
+              }
+              className="border px-4 py-2 mb-2 mr-2"
+            />
+            <input
+              type="text"
+              placeholder="Category"
+              value={editGownData.category}
+              onChange={(e) =>
+                setEditGownData({ ...editGownData, category: e.target.value })
+              }
+              className="border px-4 py-2 mb-2 mr-2"
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={editGownData.price}
+              onChange={(e) =>
+                setEditGownData({ ...editGownData, price: e.target.value })
+              }
+              className="border px-4 py-2 mb-2 mr-2"
+            />
+            <div className="flex space-x-2">
+              <button
+                onClick={handleUpdateGown}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-400"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setEditGownData(null)}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default AdminInventory;
+ 
