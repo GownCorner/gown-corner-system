@@ -15,7 +15,6 @@ const app = express();
 if (process.env.NODE_ENV !== "production") {
   console.log("MONGO_URI:", process.env.MONGO_URI || "Not Found");
   console.log("JWT_SECRET:", process.env.JWT_SECRET || "Not Found");
-  console.log("PayMongo Secret Key:", process.env.PAYMONGO_SECRET_KEY || "Not Found");
 }
 
 // Validate critical environment variables
@@ -26,8 +25,8 @@ if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
 
 // CORS Configuration
 const allowedOrigins = [
-  "http://localhost:3000", // Local development
-  "https://gown-booking-system-fronend.onrender.com", // Frontend Render Deployment
+  "http://localhost:3000", // Local frontend
+  "https://gown-booking-system-fronend.onrender.com", // Render frontend
 ];
 
 app.use(
@@ -53,12 +52,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Webhook-specific middleware to handle raw payloads
-app.use(
-  "/api/webhooks",
-  express.raw({ type: "application/json" }) // Parse raw JSON payload for webhook requests
-);
-
 // MongoDB connection
 mongoose.set("strictQuery", false); // Suppress Mongoose strictQuery warning
 mongoose
@@ -80,23 +73,6 @@ const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
-const webhookRoutes = require("./routes/webhookRoutes");
-
-// Schedule daily email notifications for pending payments at 9 AM
-cron.schedule("0 9 * * *", async () => {
-  console.log("Running daily notification job...");
-  try {
-    await notifyPendingPayments();
-    console.log("Daily notification job completed.");
-  } catch (err) {
-    console.error("Error in daily notification job:", err.message);
-  }
-});
-
-// Default root route
-app.get("/", (req, res) => {
-  res.send("Welcome to the Gown Booking System Backend!");
-});
 
 // Use routes
 app.use("/api/auth", authRoutes);
@@ -106,7 +82,11 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/bookings", bookingRoutes);
-app.use("/api/webhooks", webhookRoutes);
+
+// Default root route
+app.get("/", (req, res) => {
+  res.send("Welcome to the Gown Booking System Backend!");
+});
 
 // Default 404 handler
 app.use((req, res) => {
@@ -118,13 +98,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("Server Error:", err.stack);
   res.status(500).json({ message: "Server Error", error: err.message });
-});
-
-// Graceful shutdown
-process.on("SIGINT", async () => {
-  console.log("Shutting down server...");
-  await mongoose.connection.close();
-  process.exit(0);
 });
 
 // Start the server
