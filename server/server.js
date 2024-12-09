@@ -27,7 +27,7 @@ if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
 // CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000", // Local development
-  "https://gown-booking-system-1zkm969kt-gowncorners-projects.vercel.app", // Production Frontend URL
+  "https://gown-booking-system-fronend.onrender.com", // Frontend Render Deployment
 ];
 
 app.use(
