@@ -1,57 +1,57 @@
 import axios from "axios";
 
-// Use REACT_APP_API_BASE_URL from environment variables or fallback to localhost
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api", // Dynamically configure base URL
+const API = axios.create({
+  baseURL: "http://localhost:5000/api", // Backend base URL
   headers: {
-    "Content-Type": "application/json", // Default content type
+    "Content-Type": "application/json",
   },
 });
 
-// Add an interceptor to include the authorization token in every request
-api.interceptors.request.use(
+// Include authorization token in requests
+API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    const token = localStorage.getItem("token");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Add Authorization header
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Outgoing Request:", {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      data: config.data,
-    }); // Debug log for outgoing requests
     return config;
   },
-  (error) => {
-    console.error("Request Error:", error.message); // Debug log for request errors
-    return Promise.reject(error); // Handle request errors
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add an interceptor to handle responses globally
-api.interceptors.response.use(
-  (response) => {
-    console.log("Incoming Response:", {
-      status: response.status,
-      data: response.data,
-      headers: response.headers,
-    }); // Debug log for successful responses
-    return response; // Pass through successful responses
-  },
+// Handle unauthorized responses
+API.interceptors.response.use(
+  (response) => response,
   (error) => {
-    console.error("Response Error:", {
-      message: error.message,
-      response: error.response ? error.response.data : "No response data",
-    }); // Debug log for response errors
-    // Handle 401 Unauthorized globally
     if (error.response && error.response.status === 401) {
-      console.error("Unauthorized access - logging out...");
-      localStorage.removeItem("token"); // Clear token
-      window.location.href = "/login"; // Redirect to login
+      console.error("Unauthorized - Redirecting to login...");
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
-    return Promise.reject(error); // Pass through other errors
+    return Promise.reject(error);
   }
 );
 
-export default api;
+// Fetch all bookings (admin view)
+export const fetchBookings = async () => {
+  try {
+    const response = await API.get("/bookings");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching bookings:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Delete a booking by ID
+export const deleteBooking = async (bookingId) => {
+  try {
+    const response = await API.delete(`/bookings/${bookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting booking:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export default API;
