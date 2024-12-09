@@ -3,10 +3,18 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const cron = require("node-cron");
+const compression = require("compression");
+const morgan = require("morgan");
 const { notifyPendingPayments } = require("./controllers/orderController");
 
 // Load environment variables
 dotenv.config();
+
+// Validate critical environment variables
+if (!process.env.MONGO_URI || !process.env.JWT_SECRET || !process.env.PAYMONGO_SECRET_KEY) {
+  console.error("Critical environment variables are missing. Shutting down...");
+  process.exit(1);
+}
 
 // Initialize Express app
 const app = express();
@@ -18,16 +26,10 @@ if (process.env.NODE_ENV !== "production") {
   console.log("PayMongo Secret Key:", process.env.PAYMONGO_SECRET_KEY || "Not Found");
 }
 
-// Validate critical environment variables
-if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
-  console.error("Critical environment variables missing");
-  process.exit(1);
-}
-
 // CORS Configuration
-const allowedOrigins = [
-  "http://localhost:3000", // Local development
-  "https://gown-booking-system-1zkm969kt-gowncorners-projects.vercel.app", // Production Frontend URL
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
+  "http://localhost:3000",
+  "https://gown-booking-system-frontend1.onrender.com",
 ];
 
 app.use(
@@ -46,20 +48,25 @@ app.use(
 
 // Middleware
 app.use(express.json()); // Parse JSON requests
+app.use(compression()); // Enable response compression
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev")); // Log requests in development
+}
 
-// Request Logger (for debugging)
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
-
-// Webhook-specific middleware to handle raw payloads
+// Webhook-specific middleware
 app.use(
   "/api/webhooks",
-  express.raw({ type: "application/json" }) // Parse raw JSON payload for webhook requests
+  express.raw({ type: "application/json" }),
+  (err, req, res, next) => {
+    if (err) {
+      console.error("Error parsing webhook payload:", err.message);
+      return res.status(400).send("Invalid payload");
+    }
+    next();
+  }
 );
 
-// MongoDB connection
+// MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -68,10 +75,10 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => {
     console.error("MongoDB Connection Error:", err.message);
-    process.exit(1); // Exit if MongoDB connection fails
+    process.exit(1);
   });
 
-// Route imports
+// Route Imports
 const gownRoutes = require("./routes/gownRoutes");
 const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
@@ -81,7 +88,7 @@ const userRoutes = require("./routes/userRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
 
-// Schedule daily email notifications for pending payments at 9 AM
+// Schedule daily email notifications
 cron.schedule("0 9 * * *", async () => {
   console.log("Running daily notification job...");
   try {
@@ -92,7 +99,7 @@ cron.schedule("0 9 * * *", async () => {
   }
 });
 
-// Use routes
+// Use Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/gowns", gownRoutes);
 app.use("/api/cart", cartRoutes);
@@ -111,7 +118,7 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error("Server Error:", err.stack);
-  res.status(500).json({ message: "Server Error", error: err.message });
+  res.status(err.status || 500).json({ message: err.message || "Server Error" });
 });
 
 // Graceful shutdown
@@ -121,6 +128,12 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-// Start the server
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM received. Shutting down gracefully...");
+  await mongoose.connection.close();
+  process.exit(0);
+});
+
+// Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
