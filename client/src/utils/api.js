@@ -1,10 +1,10 @@
 import axios from "axios";
 
-// Determine base URL based on environment
+// Determine the base URL based on the environment
 const API_BASE_URL =
   process.env.NODE_ENV === "production"
-    ? "https://gown-booking-system.onrender.com/api" // Production backend
-    : "http://localhost:5000/api"; // Local backend during development
+    ? "https://gown-booking-system.onrender.com/api" // Production backend URL
+    : "http://localhost:5000/api"; // Development backend URL
 
 // Create an Axios instance
 const api = axios.create({
