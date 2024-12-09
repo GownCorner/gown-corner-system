@@ -24,7 +24,7 @@ if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
 }
 
 // CORS Configuration
-const allowedOrigins = [
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
   "http://localhost:3000", // Local frontend
   "https://gown-booking-system-fronend.onrender.com", // Render frontend
 ];
@@ -100,7 +100,26 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Server Error", error: err.message });
 });
 
+// Graceful Shutdown
+process.on("SIGINT", async () => {
+  console.log("Shutting down server...");
+  await mongoose.connection.close();
+  process.exit(0);
+});
+
+// Cron Job for Pending Payments (Production only)
+if (process.env.NODE_ENV === "production") {
+  cron.schedule("0 9 * * *", async () => {
+    console.log("Running daily notification job...");
+    try {
+      await notifyPendingPayments();
+      console.log("Daily notification job completed.");
+    } catch (err) {
+      console.error("Error in daily notification job:", err.message);
+    }
+  });
+}
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
