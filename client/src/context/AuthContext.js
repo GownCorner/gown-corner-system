@@ -18,9 +18,12 @@ export const AuthProvider = ({ children }) => {
             return;
           }
 
-          const response = await axios.get("http://localhost:5000/api/auth/me", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await axios.get(
+            "https://gown-booking-system.onrender.com/api/auth/me", // Updated Render backend URL
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           setUser(response.data);
         } catch (error) {
           console.error("Error fetching user:", error.message);
@@ -34,10 +37,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://gown-booking-system.onrender.com/api/auth/login", // Updated Render backend URL
+        {
+          email,
+          password,
+        }
+      );
       localStorage.setItem("token", response.data.token); // Save token
       setUser(response.data.user); // Update user state immediately
     } catch (error) {
