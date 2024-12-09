@@ -26,13 +26,14 @@ if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
 
 // CORS Configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
-  "http://localhost:3000", // Local frontend
-  "https://gown-booking-system-frontend.onrender.com", // Render frontend
+  "http://localhost:3000",
+  "https://gown-booking-system-frontend.onrender.com",
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
+      console.log("Incoming origin:", origin); // Debug log
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -54,7 +55,7 @@ app.use((req, res, next) => {
 });
 
 // MongoDB connection
-mongoose.set("strictQuery", false); // Suppress Mongoose strictQuery warning
+mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -63,7 +64,7 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => {
     console.error("MongoDB Connection Error:", err.message);
-    process.exit(1); // Exit if MongoDB connection fails
+    process.exit(1);
   });
 
 // Route imports
@@ -83,6 +84,11 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/bookings", bookingRoutes);
+
+// Debug endpoint
+app.get("/api/debug", (req, res) => {
+  res.json({ message: "Debug endpoint working!" });
+});
 
 // Default root route
 app.get("/", (req, res) => {
