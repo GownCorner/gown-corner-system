@@ -49,12 +49,6 @@ app.use(
 // Middleware
 app.use(express.json()); // Parse JSON requests
 
-// Request Logger
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
-
 // MongoDB Connection
 mongoose.set("strictQuery", false);
 mongoose
@@ -65,7 +59,7 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => {
     console.error("MongoDB Connection Error:", err.message);
-    process.exit(1); // Exit on connection failure
+    process.exit(1);
   });
 
 // Import Routes
@@ -96,37 +90,11 @@ app.get("/", (req, res) => {
   res.send("Welcome to the Gown Booking System Backend!");
 });
 
-// Default 404 Handler
-app.use((req, res) => {
-  console.error(`404 Error: ${req.method} ${req.url} not found`);
-  res.status(404).json({ message: `Endpoint ${req.url} not found` });
-});
-
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Server Error:", err.stack);
   res.status(500).json({ message: "Server Error", error: err.message });
 });
-
-// Graceful Shutdown
-process.on("SIGINT", async () => {
-  console.log("Shutting down server...");
-  await mongoose.connection.close();
-  process.exit(0);
-});
-
-// Cron Job for Pending Payments
-if (process.env.NODE_ENV === "production") {
-  cron.schedule("0 9 * * *", async () => {
-    console.log("Running daily notification job...");
-    try {
-      await notifyPendingPayments();
-      console.log("Daily notification job completed.");
-    } catch (err) {
-      console.error("Error in daily notification job:", err.message);
-    }
-  });
-}
 
 // Start the Server
 const PORT = process.env.PORT || 5000;
