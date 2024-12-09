@@ -12,13 +12,16 @@ const Login = () => {
     setErrorMessage(null); // Reset error message
 
     try {
-      const response = await fetch("https://gown-booking-system.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "https://gown-booking-system.onrender.com/api/auth/login", // Backend login API
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
