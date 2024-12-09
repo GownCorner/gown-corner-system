@@ -26,7 +26,7 @@ if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
 
 // CORS Configuration
 const allowedOrigins = [
-  "http://localhost:5000", // Local development
+  "http://localhost:3000", // Local development
   "https://gown-booking-system-fronend.onrender.com", // Frontend Render Deployment
 ];
 
