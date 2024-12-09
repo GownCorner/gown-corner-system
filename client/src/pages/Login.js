@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../utils/api"; // Import the configured Axios instance
+import api from "../utils/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,16 +13,14 @@ const Login = () => {
     setErrorMessage(null);
 
     try {
-      // Use the Axios instance to make the API call
       const response = await api.post("/auth/login", { email, password });
 
       console.log("Login successful:", response.data);
 
-      // Save the token and navigate based on user role
       localStorage.setItem("token", response.data.token);
       navigate(response.data.user.role === "admin" ? "/admin/dashboard" : "/");
     } catch (error) {
-      console.error("Login error:", error.message);
+      console.error("Login error (full):", error.response || error.message);
       setErrorMessage(
         error.response?.data?.message || "Login failed. Please try again."
       );
