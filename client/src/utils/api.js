@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// Create an Axios instance with a base URL
+// Create an Axios instance with the deployed backend base URL
 const api = axios.create({
-  baseURL: "http://localhost:5000/api", // Backend base URL
+  baseURL: "https://gown-booking-system.onrender.com/api", // Deployed backend base URL
   headers: {
     "Content-Type": "application/json", // Default content type
   },
