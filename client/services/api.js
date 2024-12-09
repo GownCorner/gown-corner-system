@@ -1,87 +1,45 @@
 import axios from "axios";
 
-// Use REACT_APP_API_BASE_URL from environment variables or fallback to localhost
-export const url = process.env.REACT_APP_API_BASE_URL || "https://gown-booking-system.onrender.com/api";
-
-// Create Axios instance with base URL
-const api = axios.create({
-  baseURL: url,
+// Create Axios instance
+const API = axios.create({
+  baseURL: "http://localhost:5000/api", // Backend base URL
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Intercept request to include Authorization header if token exists
-api.interceptors.request.use(
+// Include authorization token in requests
+API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Outgoing Request:", {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      data: config.data,
-    }); // Debug log
     return config;
   },
-  (error) => {
-    console.error("Request Error:", error.message);
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Intercept responses
-api.interceptors.response.use(
-  (response) => {
-    console.log("Incoming Response:", {
-      status: response.status,
-      data: response.data,
-      headers: response.headers,
-    }); // Debug log
-    return response;
-  },
+// Handle unauthorized responses
+API.interceptors.response.use(
+  (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
       console.error("Unauthorized - Redirecting to login...");
       localStorage.removeItem("token");
-      window.location.href = "/login"; // Redirect to login
+      window.location.href = "/login";
     }
-    console.error("Response Error:", {
-      message: error.message,
-      response: error.response ? error.response.data : "No response data",
-    });
     return Promise.reject(error);
   }
 );
 
-// Utility function to fetch all bookings (admin view)
-export const fetchBookings = async () => {
-  try {
-    const response = await api.get("/bookings");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching bookings:", error.response?.data || error.message);
-    throw error;
-  }
-};
+////////////////////
+// Gowns API
+////////////////////
 
-// Utility function to delete a booking by ID
-export const deleteBooking = async (bookingId) => {
-  try {
-    const response = await api.delete(`/bookings/${bookingId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting booking:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-// Utility function to fetch all gowns
 export const fetchGowns = async () => {
   try {
-    const response = await api.get("/gowns");
+    const response = await API.get("/gowns");
     return response.data;
   } catch (error) {
     console.error("Error fetching gowns:", error.response?.data || error.message);
@@ -89,28 +47,130 @@ export const fetchGowns = async () => {
   }
 };
 
-// Utility function to add a gown to the cart
-export const addToCart = async (gownId, startDate, endDate, price) => {
+export const addGown = async (gownData) => {
   try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      throw new Error("Unauthorized. Please log in.");
-    }
-    const response = await api.post(
-      "/cart/add",
-      { gownId, startDate, endDate, price },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await API.post("/gowns", gownData);
     return response.data;
   } catch (error) {
-    console.error("Error adding to cart:", error.response?.data || error.message);
+    console.error("Error adding gown:", error.response?.data || error.message);
     throw error;
   }
 };
 
-// Export the consolidated Axios instance
-export default api;
+export const editGown = async (gownId, updatedData) => {
+  try {
+    const response = await API.put(`/gowns/${gownId}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating gown:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteGown = async (gownId) => {
+  try {
+    const response = await API.delete(`/gowns/${gownId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting gown:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+////////////////////
+// Users API
+////////////////////
+
+export const getAllUsers = async () => {
+  try {
+    const response = await API.get("/users");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const editUser = async (userId, updatedData) => {
+  try {
+    const response = await API.put(`/users/${userId}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    const response = await API.delete(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+////////////////////
+// Bookings API
+////////////////////
+
+export const fetchBookings = async (status = "") => {
+  try {
+    const response = await API.get("/bookings", {
+      params: { status }, // Pass status as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching bookings:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const updateBookingStatus = async (bookingId, status) => {
+  try {
+    const response = await API.put(`/bookings/${bookingId}`, { status });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating booking status:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteBooking = async (bookingId) => {
+  try {
+    const response = await API.delete(`/bookings/${bookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting booking:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+////////////////////
+// Orders API
+////////////////////
+
+export const fetchOrders = async (status = "") => {
+  try {
+    const response = await API.get("/orders", {
+      params: { status }, // Pass status as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching orders:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteOrder = async (orderId) => {
+  try {
+    const response = await API.delete(`/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting order:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export default API;
