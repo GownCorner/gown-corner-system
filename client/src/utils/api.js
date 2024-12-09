@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// Use REACT_APP_API_BASE_URL from environment variables or fallback to localhost
+// Dynamically configure base URL using environment variable or fallback
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api", // Dynamically configure base URL
+  baseURL: process.env.REACT_APP_API_BASE_URL || "https://gown-booking-system.onrender.com/api", // Use Render-deployed backend as fallback
   headers: {
     "Content-Type": "application/json", // Default content type
   },
