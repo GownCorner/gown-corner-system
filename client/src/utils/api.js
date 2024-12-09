@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// Use REACT_APP_API_BASE_URL from environment variables or fallback to localhost
-export const url = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api";
+// Use REACT_APP_API_BASE_URL from environment variables or fallback to local
+export const url = process.env.REACT_APP_API_BASE_URL || "https://gown-booking-system.onrender.com/api";
 
 // Create Axios instance with base URL
 const api = axios.create({
