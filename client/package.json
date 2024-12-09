@@ -30,6 +30,7 @@
     "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:5000",
+  "proxy": "https://gown-booking-system.onrender.com",
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "autoprefixer": "^10.4.20",
