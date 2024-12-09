@@ -1,176 +1,57 @@
 import axios from "axios";
 
-// Create Axios instance
-const API = axios.create({
-  baseURL: "http://localhost:5000/api", // Backend base URL
+// Use REACT_APP_API_BASE_URL from environment variables or fallback to localhost
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api", // Dynamically configure base URL
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json", // Default content type
   },
 });
 
-// Include authorization token in requests
-API.interceptors.request.use(
+// Add an interceptor to include the authorization token in every request
+api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token"); // Retrieve token from localStorage
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`; // Add Authorization header
     }
+    console.log("Outgoing Request:", {
+      url: config.url,
+      method: config.method,
+      headers: config.headers,
+      data: config.data,
+    }); // Debug log for outgoing requests
     return config;
   },
-  (error) => Promise.reject(error)
-);
-
-// Handle unauthorized responses
-API.interceptors.response.use(
-  (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      console.error("Unauthorized - Redirecting to login...");
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
+    console.error("Request Error:", error.message); // Debug log for request errors
+    return Promise.reject(error); // Handle request errors
   }
 );
 
-////////////////////
-// Gowns API
-////////////////////
-
-export const fetchGowns = async () => {
-  try {
-    const response = await API.get("/gowns");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching gowns:", error.response?.data || error.message);
-    throw error;
+// Add an interceptor to handle responses globally
+api.interceptors.response.use(
+  (response) => {
+    console.log("Incoming Response:", {
+      status: response.status,
+      data: response.data,
+      headers: response.headers,
+    }); // Debug log for successful responses
+    return response; // Pass through successful responses
+  },
+  (error) => {
+    console.error("Response Error:", {
+      message: error.message,
+      response: error.response ? error.response.data : "No response data",
+    }); // Debug log for response errors
+    // Handle 401 Unauthorized globally
+    if (error.response && error.response.status === 401) {
+      console.error("Unauthorized access - logging out...");
+      localStorage.removeItem("token"); // Clear token
+      window.location.href = "/login"; // Redirect to login
+    }
+    return Promise.reject(error); // Pass through other errors
   }
-};
+);
 
-export const addGown = async (gownData) => {
-  try {
-    const response = await API.post("/gowns", gownData);
-    return response.data;
-  } catch (error) {
-    console.error("Error adding gown:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const editGown = async (gownId, updatedData) => {
-  try {
-    const response = await API.put(`/gowns/${gownId}`, updatedData);
-    return response.data;
-  } catch (error) {
-    console.error("Error updating gown:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const deleteGown = async (gownId) => {
-  try {
-    const response = await API.delete(`/gowns/${gownId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting gown:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-////////////////////
-// Users API
-////////////////////
-
-export const getAllUsers = async () => {
-  try {
-    const response = await API.get("/users");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching users:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const editUser = async (userId, updatedData) => {
-  try {
-    const response = await API.put(`/users/${userId}`, updatedData);
-    return response.data;
-  } catch (error) {
-    console.error("Error updating user:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const deleteUser = async (userId) => {
-  try {
-    const response = await API.delete(`/users/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting user:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-////////////////////
-// Bookings API
-////////////////////
-
-export const fetchBookings = async (status = "") => {
-  try {
-    const response = await API.get("/bookings", {
-      params: { status }, // Pass status as a query parameter
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching bookings:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const updateBookingStatus = async (bookingId, status) => {
-  try {
-    const response = await API.put(`/bookings/${bookingId}`, { status });
-    return response.data;
-  } catch (error) {
-    console.error("Error updating booking status:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const deleteBooking = async (bookingId) => {
-  try {
-    const response = await API.delete(`/bookings/${bookingId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting booking:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-////////////////////
-// Orders API
-////////////////////
-
-export const fetchOrders = async (status = "") => {
-  try {
-    const response = await API.get("/orders", {
-      params: { status }, // Pass status as a query parameter
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching orders:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const deleteOrder = async (orderId) => {
-  try {
-    const response = await API.delete(`/orders/${orderId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting order:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export default API;
+export default api;
