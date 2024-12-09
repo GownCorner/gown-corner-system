@@ -15,6 +15,7 @@ const app = express();
 if (process.env.NODE_ENV !== "production") {
   console.log("MONGO_URI:", process.env.MONGO_URI || "Not Found");
   console.log("JWT_SECRET:", process.env.JWT_SECRET || "Not Found");
+  console.log("ALLOWED_ORIGINS:", process.env.ALLOWED_ORIGINS || "Not Found");
 }
 
 // Validate critical environment variables
@@ -26,7 +27,7 @@ if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
 // CORS Configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
   "http://localhost:3000", // Local frontend
-  "https://gown-booking-system-fronend.onrender.com", // Render frontend
+  "https://gown-booking-system-frontend.onrender.com", // Render frontend
 ];
 
 app.use(
