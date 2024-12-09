@@ -1,9 +1,10 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
-export const AuthContext = createContext();
+// Use REACT_APP_API_BASE_URL from the environment variables
+export const url = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api"; // Fallback to local backend if not set
 
-export const url = "https://gown-booking-system.onrender.com/api"; // Export the base backend URL
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
