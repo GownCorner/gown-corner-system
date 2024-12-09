@@ -60,6 +60,7 @@ app.use(
 );
 
 // MongoDB connection
+mongoose.set("strictQuery", false); // Suppress Mongoose strictQuery warning
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -90,6 +91,11 @@ cron.schedule("0 9 * * *", async () => {
   } catch (err) {
     console.error("Error in daily notification job:", err.message);
   }
+});
+
+// Default root route
+app.get("/", (req, res) => {
+  res.send("Welcome to the Gown Booking System Backend!");
 });
 
 // Use routes
