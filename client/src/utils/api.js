@@ -2,7 +2,8 @@ import axios from "axios";
 
 // Dynamically configure base URL using environment variable or fallback
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "https://gown-booking-system.onrender.com/api", // Use Render-deployed backend as fallback
+  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api", // Use backend deployed or local URL
+  timeout: 20000, // Set timeout to 20 seconds for slow server responses
   headers: {
     "Content-Type": "application/json", // Default content type
   },
@@ -49,6 +50,11 @@ api.interceptors.response.use(
       console.error("Unauthorized access - logging out...");
       localStorage.removeItem("token"); // Clear token
       window.location.href = "/login"; // Redirect to login
+    }
+    if (error.code === "ECONNABORTED") {
+      // Timeout error
+      console.error("Timeout Error:", error.message);
+      return Promise.reject(new Error("Request timeout. Please try again later."));
     }
     return Promise.reject(error); // Pass through other errors
   }

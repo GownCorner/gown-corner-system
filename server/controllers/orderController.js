@@ -1,23 +1,22 @@
 const Order = require("../models/Order");
-const axios = require("axios");
 const nodemailer = require("nodemailer");
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
-  service: "Gmail", // Use any other email service provider if needed
+  service: "Gmail",
   auth: {
-    user: process.env.EMAIL_USERNAME, // Your email address
-    pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
-// Function to send email notifications
+// Helper function to send email
 const sendEmailNotification = async (email, subject, message) => {
   try {
     const mailOptions = {
-      from: `"GownCorner" <${process.env.EMAIL_USERNAME}>`, // Sender email
-      to: email, // Recipient email
-      subject: subject,
+      from: `"GownCorner" <${process.env.EMAIL_USERNAME}>`,
+      to: email,
+      subject,
       text: message,
     };
 
@@ -29,19 +28,11 @@ const sendEmailNotification = async (email, subject, message) => {
   }
 };
 
-// Create a new order
+// Create an order
 exports.createOrder = async (req, res) => {
   const { cartItems, totalPrice, shippingDetails } = req.body;
 
   try {
-    if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
-      return res.status(400).json({ message: "Cart items are required" });
-    }
-
-    if (!totalPrice || !shippingDetails) {
-      return res.status(400).json({ message: "Invalid or missing required fields" });
-    }
-
     const newOrder = new Order({
       userId: req.user.id,
       items: cartItems.map((item) => ({
@@ -56,75 +47,73 @@ exports.createOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
-    console.log("Order saved to database:", savedOrder);
-
-    const lineItems = cartItems.map((item) => ({
-      name: `Gown ID: ${item.gownId}`,
-      amount: item.price * 100, // Convert PHP to centavos
-      currency: "PHP",
-      quantity: 1,
-    }));
-
-    const paymentResponse = await axios.post(
-      "https://api.paymongo.com/v1/checkout_sessions",
-      {
-        data: {
-          attributes: {
-            line_items: lineItems,
-            currency: "PHP",
-            description: `Payment for Order ${savedOrder._id}`,
-            payment_method_types: ["card", "gcash"],
-            success_url: `http://localhost:3000/success?orderId=${savedOrder._id}`,
-            cancel_url: `http://localhost:3000/cancel?orderId=${savedOrder._id}`,
-          },
-        },
-      },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    console.log("PayMongo Response:", paymentResponse.data);
-
-    // Send email notification
-    const emailMessage = `
-      Hi ${shippingDetails.name},
-
-      Your order with ID ${savedOrder._id} totaling ₱${totalPrice} is pending.
-      Please complete your payment via the following link:
-
-      ${paymentResponse.data.data.attributes.checkout_url}
-
-      Thank you for choosing GownCorner!
-
-      Best regards,
-      GownCorner Team
-    `;
-
-    await sendEmailNotification(
-      shippingDetails.email,
-      "Your Pending Payment with GownCorner",
-      emailMessage
-    );
-
-    res.status(201).json({
-      message: "Order created successfully",
-      orderId: savedOrder._id,
-      checkoutUrl: paymentResponse.data.data.attributes.checkout_url,
-    });
+    res.status(201).json({ message: "Order created successfully", order: savedOrder });
   } catch (error) {
-    console.error("Error creating order or initiating payment:", error.response?.data || error.message);
-    res.status(500).json({
-      message: "Failed to create order or initiate payment.",
-      error: error.response?.data || error.message,
-    });
+    console.error("Error creating order:", error.message);
+    res.status(500).json({ message: "Failed to create order", error: error.message });
   }
 };
 
-// Fetch all orders with optional status filter
+// Fetch all orders
+exports.getAllOrders = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const query = status ? { status } : {};
+    const orders = await Order.find(query).populate("userId", "email");
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching orders:", error.message);
+    res.status(500).json({ message: "Error fetching orders", error: error.message });
+  }
+};
+
+// Update order status and send email
+exports.updateOrderStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const order = await Order.findById(id).populate("userId", "email");
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.status = status;
+    const updatedOrder = await order.save();
+
+    // Send email notification
+    const emailMessage = `
+      Hi,
+
+      Your order with ID ${updatedOrder._id} has been updated to status: ${status}.
+
+      Thank you for choosing GownCorner!
+    `;
+    await sendEmailNotification(order.userId.email, "Order Status Update", emailMessage);
+
+    res.status(200).json({ message: "Order status updated successfully", order: updatedOrder });
+  } catch (error) {
+    console.error("Error updating order status:", error.message);
+    res.status(500).json({ message: "Error updating order status", error: error.message });
+  }
+};
+
+// Delete an order
+exports.deleteOrder = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(id);
+    if (!deletedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.status(200).json({ message: "Order deleted successfully", order: deletedOrder });
+  } catch (error) {
+    console.error("Error deleting order:", error.message);
+    res.status(500).json({ message: "Error deleting order", error: error.message });
+  }
+};
 exports.getAllOrders = async (status) => {
   try {
     const query = status ? { status } : {};
@@ -135,32 +124,29 @@ exports.getAllOrders = async (status) => {
     throw new Error("Error fetching orders");
   }
 };
-
-// Update an order's status
+// Update an order's status and notify the client
 exports.updateOrderStatus = async (id, status) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
       { status },
       { new: true }
-    );
+    ).populate("userId", "email name");
+
+    if (!updatedOrder) {
+      throw new Error("Order not found");
+    }
+
+    // Send email notification
+    const clientEmail = updatedOrder.userId.email;
+    const subject = `Order Status Updated to ${status}`;
+    const message = `Dear ${updatedOrder.userId.name}, your order with ID ${updatedOrder._id} has been updated to: ${status}.`;
+
+    await sendEmail(clientEmail, subject, message);
+
     return updatedOrder;
   } catch (error) {
     console.error("Error updating order status:", error.message);
     throw error;
   }
 };
-
-// Delete an order by ID
-exports.deleteOrder = async (id) => {
-  try {
-    const deletedOrder = await Order.findByIdAndDelete(id);
-    return deletedOrder;
-  } catch (error) {
-    console.error("Error deleting order:", error.message);
-    throw error;
-  }
-};
-
-// Export email notification for reuse in other controllers
-exports.sendEmailNotification = sendEmailNotification;

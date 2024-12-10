@@ -28,8 +28,8 @@ if (process.env.NODE_ENV !== "production") {
 
 // CORS Configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
-  "http://localhost:3000",
-  "https://gown-booking-system-frontend1.onrender.com",
+  "http://localhost:3000", // Local development
+  "https://gown-booking-system-frontend1.onrender.com", // Deployed Frontend
 ];
 
 app.use(
@@ -42,6 +42,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Supported methods
     credentials: true, // Allow cookies and credentials
   })
 );

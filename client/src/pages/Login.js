@@ -6,24 +6,36 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage(null);
+    setIsLoading(true);
 
     try {
       const response = await api.post("/auth/login", { email, password });
 
       console.log("Login successful:", response.data);
 
+      // Save token to localStorage
       localStorage.setItem("token", response.data.token);
+
+      // Navigate to the correct page based on the user's role
       navigate(response.data.user.role === "admin" ? "/admin/dashboard" : "/");
     } catch (error) {
-      console.error("Login error (full):", error.response || error.message);
+      console.error("Login error (detailed):", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
       setErrorMessage(
         error.response?.data?.message || "Login failed. Please try again."
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,9 +69,12 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-green-900 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300"
+            disabled={isLoading}
+            className={`w-full py-2 px-4 rounded-md text-white transition duration-300 ${
+              isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-green-900 hover:bg-green-700"
+            }`}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
         <div className="mt-4 text-center">

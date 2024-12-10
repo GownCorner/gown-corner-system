@@ -112,43 +112,7 @@ export const deleteUser = async (userId) => {
 };
 
 ////////////////////
-// Bookings API
-////////////////////
-
-export const fetchBookings = async (status = "") => {
-  try {
-    const response = await API.get("/bookings", {
-      params: { status }, // Pass status as a query parameter
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching bookings:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const updateBookingStatus = async (bookingId, status) => {
-  try {
-    const response = await API.put(`/bookings/${bookingId}`, { status });
-    return response.data;
-  } catch (error) {
-    console.error("Error updating booking status:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-export const deleteBooking = async (bookingId) => {
-  try {
-    const response = await API.delete(`/bookings/${bookingId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting booking:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-////////////////////
-// Orders API
+// Orders API (Fetching Orders Instead of Bookings)
 ////////////////////
 
 export const fetchOrders = async (status = "") => {
@@ -163,12 +127,34 @@ export const fetchOrders = async (status = "") => {
   }
 };
 
+export const updateOrderStatus = async (orderId, status) => {
+  try {
+    const response = await API.put(`/orders/${orderId}`, { status });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating order status:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const deleteOrder = async (orderId) => {
   try {
     const response = await API.delete(`/orders/${orderId}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting order:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const fetchBookings = async (status = "") => {
+  try {
+    const response = await API.get("/orders", {
+      params: { status }, // Adjust filter for orders
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching orders:", error.response?.data || error.message);
     throw error;
   }
 };

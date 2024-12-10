@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// Create Axios instance
 const API = axios.create({
   baseURL: "http://localhost:5000/api", // Backend base URL
   headers: {
@@ -32,24 +33,41 @@ API.interceptors.response.use(
   }
 );
 
-// Fetch all bookings (admin view)
-export const fetchBookings = async () => {
+////////////////////
+// Orders API
+////////////////////
+
+// Fetch all orders with optional status filter
+export const fetchOrders = async (status = "") => {
   try {
-    const response = await API.get("/bookings");
+    const response = await API.get("/orders", {
+      params: { status }, // Pass status as a query parameter
+    });
     return response.data;
   } catch (error) {
-    console.error("Error fetching bookings:", error.response?.data || error.message);
+    console.error("Error fetching orders:", error.response?.data || error.message);
     throw error;
   }
 };
 
-// Delete a booking by ID
-export const deleteBooking = async (bookingId) => {
+// Update the status of an order
+export const updateOrderStatus = async (orderId, status) => {
   try {
-    const response = await API.delete(`/bookings/${bookingId}`);
+    const response = await API.put(`/orders/${orderId}`, { status }); // Corrected endpoint
     return response.data;
   } catch (error) {
-    console.error("Error deleting booking:", error.response?.data || error.message);
+    console.error("Error updating order status:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Delete an order by ID
+export const deleteOrder = async (orderId) => {
+  try {
+    const response = await API.delete(`/orders/${orderId}`); // Corrected endpoint
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting order:", error.response?.data || error.message);
     throw error;
   }
 };

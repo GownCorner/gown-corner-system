@@ -7,9 +7,13 @@ const BookingSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     totalPrice: { type: Number, required: true },
-    paymentStatus: { type: String, enum: ["PENDING", "SUCCESS", "FAILED"], default: "PENDING" }, // New field
+    paymentStatus: { 
+      type: String, 
+      enum: ["PENDING", "SUCCESS", "FAILED"], 
+      default: "PENDING" 
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Booking", BookingSchema);
+module.exports = mongoose.model("Booking", BookingSchema, "bookings"); // Explicitly use "bookings" collection

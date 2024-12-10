@@ -23,7 +23,7 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-// Route to update an order's status
+// Route to update an order's status and notify the client
 router.put("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -59,5 +59,6 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Error deleting order", error: error.message });
   }
 });
+
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchOrders, deleteOrder } from "../services/api";
+import { fetchOrders, deleteOrder, updateOrderStatus } from "../services/api";
 
 const AdminBookings = () => {
   const [orders, setOrders] = useState([]);
@@ -26,7 +26,7 @@ const AdminBookings = () => {
   }, [filter]);
 
   const handleDelete = async (orderId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this booking?");
+    const confirmDelete = window.confirm("Are you sure you want to delete this order?");
     if (!confirmDelete) return;
 
     try {
@@ -34,7 +34,27 @@ const AdminBookings = () => {
       setOrders(orders.filter((order) => order._id !== orderId));
     } catch (err) {
       console.error("Error deleting order:", err);
-      alert("Failed to delete the booking. Please try again.");
+      alert("Failed to delete the order. Please try again.");
+    }
+  };
+
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    const confirmUpdate = window.confirm(
+      `Are you sure you want to update the order status to "${newStatus}"?`
+    );
+    if (!confirmUpdate) return;
+
+    try {
+      await updateOrderStatus(orderId, newStatus);
+      setOrders(
+        orders.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+      alert("Order status updated.");
+    } catch (err) {
+      console.error("Error updating order status:", err);
+      alert("Failed to update the order status. Please try again.");
     }
   };
 
@@ -86,16 +106,30 @@ const AdminBookings = () => {
               orders.map((order) => (
                 <tr key={order._id}>
                   <td className="px-4 py-2 border">{order._id}</td>
-                  <td className="px-4 py-2 border">{order.shippingDetails.email}</td>
+                  <td className="px-4 py-2 border">{order.userId?.email || "No Email"}</td>
                   <td className="px-4 py-2 border">₱{order.totalPrice}</td>
                   <td className="px-4 py-2 border">{order.status}</td>
                   <td className="px-4 py-2 border">
-                    <button
-                      onClick={() => handleDelete(order._id)}
-                      className="bg-red-500 text-white px-2 py-1 rounded"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleStatusUpdate(order._id, "SUCCESS")}
+                        className="bg-green-500 text-white px-2 py-1 rounded"
+                      >
+                        Mark as Paid
+                      </button>
+                      <button
+                        onClick={() => handleStatusUpdate(order._id, "FAILED")}
+                        className="bg-yellow-500 text-white px-2 py-1 rounded"
+                      >
+                        Mark as Failed
+                      </button>
+                      <button
+                        onClick={() => handleDelete(order._id)}
+                        className="bg-red-500 text-white px-2 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
